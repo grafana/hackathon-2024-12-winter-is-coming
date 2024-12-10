@@ -1,0 +1,18 @@
+# config file version
+apiVersion: 1
+providers:
+  - name: TENANT_ID
+    value: ad4234ra-24423k-as23
+    scope: org
+    scope_id: 1
+    type: constant
+  - name: APPLICATION_ID
+    value: my-prod-app
+    scope: folder
+    scope_id: prod-folder-dkl24
+    type: constant
+  - name: APPLICATION_ID
+    value: my-dev-app
+    scope: folder
+    scope_id: prod-folder-afsSk3
+    type: constant

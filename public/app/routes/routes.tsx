@@ -133,6 +133,12 @@ export function getAppRoutes(): RouteDescriptor[] {
       ),
     },
     {
+      path: '/variables',
+      component: SafeDynamicImport(
+        () => import(/* webpackChunkName: "VariablesListPage"*/ 'app/features/variables-v2/VariablesListPage')
+      ),
+    },
+    {
       path: '/dashboards',
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "DashboardListPage"*/ 'app/features/browse-dashboards/BrowseDashboardsPage')
@@ -499,6 +505,13 @@ export function getAppRoutes(): RouteDescriptor[] {
       roles: () => contextSrv.evaluatePermission([AccessControlAction.AlertingRuleRead]),
       component: SafeDynamicImport(
         () => import(/* webpackChunkName: "FolderAlerting"*/ 'app/features/browse-dashboards/BrowseFolderAlertingPage')
+      ),
+    },
+    {
+      path: '/dashboards/f/:uid/:slug/variables',
+      component: SafeDynamicImport(
+        () =>
+          import(/* webpackChunkName: "FolderVariables"*/ 'app/features/browse-dashboards/BrowseFolderVariablesPage')
       ),
     },
     {

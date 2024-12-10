@@ -1,11 +1,11 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useState, useMemo } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { useMount } from 'react-use';
 
 import { PluginExtensionComponent, PluginExtensionPoints } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { usePluginComponentExtensions } from '@grafana/runtime';
-import { Tab, TabsBar, TabContent, Stack } from '@grafana/ui';
+import { usePluginComponentExtensions, config } from '@grafana/runtime';
+import { Tab, TabsBar, TabContent, Stack, Button, InteractiveTable, Column, CellProps } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import SharedPreferences from 'app/core/components/SharedPreferences/SharedPreferences';
 import { useQueryParams } from 'app/core/hooks/useQueryParams';
@@ -17,6 +17,19 @@ import UserProfileEditForm from './UserProfileEditForm';
 import UserSessions from './UserSessions';
 import { UserTeams } from './UserTeams';
 import { changeUserOrg, initUserProfilePage, revokeUserSession, updateUserProfile } from './state/actions';
+
+type Variable = {
+  id: string;
+  uid: string;
+  name: string;
+  value?: string;
+  description?: string;
+  scope?: string;
+  scope_id?: string;
+  type?: string;
+};
+
+type Cell<T extends keyof Variable = keyof Variable> = CellProps<Variable, Variable[T]>;
 
 const TAB_QUERY_PARAM = 'tab';
 const GENERAL_SETTINGS_TAB = 'general';
@@ -107,6 +120,7 @@ export function UserProfileEditPage({
       <UserProfileEditForm updateProfile={updateUserProfile} isSavingUser={isUpdating} user={user} />
       <SharedPreferences resourceUri="user" preferenceType="user" />
       <Stack direction="column" gap={6}>
+        <UserVariables />
         <UserTeams isLoading={teamsAreLoading} teams={teams} />
         <UserOrganizations isLoading={orgsAreLoading} setUserOrg={changeUserOrg} orgs={orgs} user={user} />
         <UserSessions isLoading={sessionsAreLoading} revokeUserSession={revokeUserSession} sessions={sessions} />
@@ -160,5 +174,81 @@ export function UserProfileEditPage({
     </Page>
   );
 }
+
+const UserVariables = () => {
+  const variables: Variable[] = [
+    { id: '1', uid: crypto.randomUUID(), name: 'foo', value: 'foo value', description: 'something about foo' },
+    { id: '2', uid: crypto.randomUUID(), name: 'bar', value: 'bar value', description: 'something about bar' },
+    { id: '3', uid: crypto.randomUUID(), name: 'baz', value: 'baz value', description: 'something about baz' },
+  ];
+  const columns: Array<Column<Variable>> = useMemo(
+    () => [
+      { id: 'name', header: 'name', cell: ({ cell: { value } }: Cell<'name'>) => value && <>{value.toUpperCase()}</> },
+      { id: 'value', header: 'value', cell: ({ cell: { value } }: Cell<'value'>) => value && <>{value}</> },
+      {
+        id: 'description',
+        header: 'description',
+        cell: ({ cell: { value } }: Cell<'description'>) => value && <>{value}</>,
+      },
+      {
+        id: 'scope',
+        header: 'scope',
+        cell: ({ cell: { value } }: Cell<'scope'>) => <>{'user'}</>,
+      },
+      {
+        id: 'scope_id',
+        header: 'scope_id',
+        cell: ({ cell: { value } }: Cell<'scope_id'>) => (
+          <>{config.bootData.user.name + ' ' + `(id : ${config.bootData.user.id})`}</>
+        ),
+      },
+      { id: 'type', header: 'type', cell: ({ cell: { value } }: Cell<'name'>) => <>{value || 'constant'}</> },
+      {
+        id: 'edit',
+        header: '',
+        cell: ({ row: { original } }: Cell) => {
+          return (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={() => {}}
+              icon="pen"
+              aria-label={`Edit variable ${original.name}`}
+            />
+          );
+        },
+      },
+      {
+        id: 'delete',
+        header: '',
+        cell: ({ row: { original } }: Cell) => {
+          return (
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={() => {}}
+              icon="times"
+              aria-label={`Delete variable ${original.name}`}
+            />
+          );
+        },
+      },
+    ],
+    []
+  );
+  return (
+    <>
+      <Stack direction={'column'} gap={0.5}>
+        <Stack>
+          <h3 className="page-sub-heading">Variables</h3>
+          <Button variant="secondary" icon={'plus-square'} size="sm">
+            Add new
+          </Button>
+        </Stack>
+        <InteractiveTable columns={columns} data={variables} getRowId={(v) => v.uid}></InteractiveTable>
+      </Stack>
+    </>
+  );
+};
 
 export default connector(UserProfileEditPage);

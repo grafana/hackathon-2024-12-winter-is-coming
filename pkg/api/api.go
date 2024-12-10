@@ -401,6 +401,7 @@ func (hs *HTTPServer) registerRoutes() {
 			nameScope := datasources.ScopeProvider.GetResourceScopeName(ac.Parameter(":name"))
 			datasourceRoute.Get("/", authorize(ac.EvalPermission(datasources.ActionRead)), routing.Wrap(hs.GetDataSources))
 			datasourceRoute.Post("/", authorize(ac.EvalPermission(datasources.ActionCreate)), quota(string(datasources.QuotaTargetSrv)), routing.Wrap(hs.AddDataSource))
+			datasourceRoute.Get("/health", authorize(ac.EvalPermission(datasources.ActionCreate)), quota(string(datasources.QuotaTargetSrv)), routing.Wrap(hs.GetDataSourcesHealth))
 			datasourceRoute.Put("/:id", authorize(ac.EvalPermission(datasources.ActionWrite, idScope)), routing.Wrap(hs.UpdateDataSourceByID))
 			datasourceRoute.Put("/uid/:uid", authorize(ac.EvalPermission(datasources.ActionWrite, uidScope)), routing.Wrap(hs.UpdateDataSourceByUID))
 			datasourceRoute.Delete("/:id", authorize(ac.EvalPermission(datasources.ActionDelete, idScope)), routing.Wrap(hs.DeleteDataSourceById))
@@ -556,6 +557,12 @@ func (hs *HTTPServer) registerRoutes() {
 
 		// short urls
 		apiRoute.Post("/short-urls", routing.Wrap(hs.createShortURL))
+
+		// variables
+		apiRoute.Get("/variables", routing.Wrap(hs.GetVariables))
+		apiRoute.Post("/variables", routing.Wrap(hs.CreateVariable))
+		apiRoute.Patch("/variables/uid/:uid", routing.Wrap(hs.UpdateVariable))
+		apiRoute.Delete("/variables/uid/:uid", routing.Wrap(hs.DeleteVariableByUID))
 	}, reqSignedIn)
 
 	// admin api
