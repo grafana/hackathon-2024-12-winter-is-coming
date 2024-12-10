@@ -10,6 +10,7 @@ export const FOLDER_ID = 'manage-folder';
 export const getDashboardsTabID = (folderUID: string) => `folder-dashboards-${folderUID}`;
 export const getLibraryPanelsTabID = (folderUID: string) => `folder-library-panels-${folderUID}`;
 export const getAlertingTabID = (folderUID: string) => `folder-alerting-${folderUID}`;
+export const getVariablesTabID = (folderUID: string) => `folder-variables-${folderUID}`;
 export const getPermissionsTabID = (folderUID: string) => `folder-permissions-${folderUID}`;
 export const getSettingsTabID = (folderUID: string) => `folder-settings-${folderUID}`;
 
@@ -56,6 +57,14 @@ export function buildNavModel(folder: FolderDTO | FolderParent, parentsArg?: Fol
       url: `${folder.url}/alerting`,
     });
   }
+
+  model.children!.push({
+    active: false,
+    icon: 'x',
+    id: getVariablesTabID(folder.uid),
+    text: t('browse-dashboards.manage-folder-nav.variables', 'Variables'),
+    url: `${folder.url}/variables`,
+  });
 
   return model;
 }

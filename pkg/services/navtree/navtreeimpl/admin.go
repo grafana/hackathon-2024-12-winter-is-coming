@@ -105,6 +105,14 @@ func (s *ServiceImpl) getAdminNode(c *contextmodel.ReqContext) (*navtree.NavLink
 		})
 	}
 
+	configNodes = append(configNodes, &navtree.NavLink{
+		Id:       "variables",
+		Text:     "❇️ Global Variables",
+		SubTitle: "Global variables, constants, secrets, vault and more....",
+		Icon:     "x",
+		Url:      s.cfg.AppSubURL + "/variables",
+	})
+
 	if (s.cfg.Env == setting.Dev) || s.features.IsEnabled(ctx, featuremgmt.FlagEnableExtensionsAdminPage) && hasAccess(pluginaccesscontrol.AdminAccessEvaluator) {
 		pluginsNodeLinks = append(pluginsNodeLinks, &navtree.NavLink{
 			Text:     "Extensions",

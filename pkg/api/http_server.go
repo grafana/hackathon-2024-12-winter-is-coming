@@ -220,6 +220,8 @@ type HTTPServer struct {
 	anonService          anonymous.Service
 	userVerifier         user.Verifier
 	tlsCerts             TLSCerts
+	/// storing variables here just for hackathon ( eventually we want to store them in SQL)
+	Variables []Variable
 }
 
 type TLSCerts struct {
@@ -274,8 +276,9 @@ func ProvideHTTPServer(opts ServerOptions, cfg *setting.Cfg, routeRegister routi
 ) (*HTTPServer, error) {
 	web.Env = cfg.Env
 	m := web.New()
-
+	variables := []Variable{}
 	hs := &HTTPServer{
+		Variables:                    variables,
 		Cfg:                          cfg,
 		RouteRegister:                routeRegister,
 		bus:                          bus,

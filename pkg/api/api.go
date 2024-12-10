@@ -557,6 +557,12 @@ func (hs *HTTPServer) registerRoutes() {
 
 		// short urls
 		apiRoute.Post("/short-urls", routing.Wrap(hs.createShortURL))
+
+		// variables
+		apiRoute.Get("/variables", routing.Wrap(hs.GetVariables))
+		apiRoute.Post("/variables", routing.Wrap(hs.CreateVariable))
+		apiRoute.Patch("/variables/uid/:uid", routing.Wrap(hs.UpdateVariable))
+		apiRoute.Delete("/variables/uid/:uid", routing.Wrap(hs.DeleteVariableByUID))
 	}, reqSignedIn)
 
 	// admin api
